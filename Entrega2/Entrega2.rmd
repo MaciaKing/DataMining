@@ -1,0 +1,169 @@
+---
+title: "Introduction to R."
+author: "Macià Salvà Salvà"
+date: "21746 Data Mining 2022-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Inlude the dataset:
+```{r}
+df=read.table(file="auto-mpg.data")
+head(df)
+```
+
+We must put name to column:
+
+```{r}
+colnames(df)=c("mpg","cylinders","displacement","horsepower","weigth","acceleration","model year","origin","car name")
+head(df)
+```
+
+Look at the characteristics of dataset:
+
+```{r}
+str(df)
+```
+
+In this dataframe, the horsepower are "chr" values and it must be double or integer. Also in our dataset, are null vaules and it must be removed.
+
+```{r}
+df$horsepower <-as.numeric(as.character(df$horsepower))
+na.omit(df)
+str(df)
+```
+
+Let's print a summary of our data:
+
+```{r}
+name=colnames(df)
+par(mfrow = c(2, 2))
+for(i in 1:length(name)) {
+  if(i!=length(name)){
+    plot(df[, name[i]], main=toupper(name[i]), ylab=name[i]) 
+    print(i)
+  }
+}
+```
+We can see that cylinders 3 and 5 are not good data. We have very few examples. Let's see what examples we have.
+```{r}
+sprintf("3 Cylynders Examples = %d", sum(df$cylinders=="3")) 
+sprintf("4 Cylynders Examples = %d", sum(df$cylinders=="4")) 
+sprintf("5 Cylynders Examples = %d", sum(df$cylinders=="5")) 
+sprintf("8 Cylynders Examples = %d", sum(df$cylinders=="8")) 
+```
+
+We can depreciate the valors of cylinders 3 and 5, because are not good examples. Also between 4 and 8 cylinders is not the best data because we have the double on 4 Cylinders with respect to the 8 cylinders.
+
+```{r}
+df=df[df$cylinders!=3, ]
+df=df[df$cylinders!=5, ]
+na.omit(df)
+sprintf("3 Cylynders Examples = %d", sum(df$cylinders=="3"))
+sprintf("5 Cylynders Examples = %d", sum(df$cylinders=="5"))
+```
+```{r}
+head(df)
+```
+
+
+### 1. What is the relation between Horsepower and the cylinders?
+
+A priori, we think that more cylinders in a car are equivalent to say, this car has more power.
+Let's make a graph between these two variables.
+
+```{r}
+boxplot(df$horsepower~df$cylinders, pch=4,main="Horsepower vs Cylinders", xlab="Horsepower", ylab="Cylinders", col='#FF5733')
+```
+
+We can see that it is true because is logical when we have more horsepower have more cylinders.
+
+```{r}
+aggregate(horsepower~cylinders,df,mean)
+```
+
+```{r}
+cy=df$cylinders
+hp=df$horsepower
+cov(df$cylinders,df$horsepower)
+```
+
+### 2. The trend of each year is to have cars with more power?
+
+This could be an interessant question to ask. But, with these data set can really anser that? People normally have a sport cars? Defnetly not. 
+
+But let's see what can be found in hour data set. For this question we decide that if a car has more than 120 horsepower is a power car.
+
+```{r}
+plot(df$`model year`,df$horsepower, main="Cylinders with Weigth", xlab="Horsepower", ylab="Model year",pch=20, col= ifelse(df$horsepower > 120, 'red','green'))
+```
+
+With these data I think that thise question can not be resolved, because we don't have the real data for these wuestion. In these data set, we only have models from 70's to 82's. Also, where are thise data from? These data is from 
+
+### 3. Which cylenders has the better MPG ratio?
+
+I think that if we have more cylinders, we will have less relation MPG. Because we have seen that, if we have more cylinders, we have more power. That power will need more gallons and will produce less relation between MPG.
+
+In these page, we can learn more about MPG: https://reviews.tn/es/wiki/what-is-a-bad-mpg/
+
+Now we will consider:
+
+* If MPG > 35 good relation.
+* If 25 < MPG < 35 is not the best relation.
+* If MPG < 25 is a bad relation.
+
+```{r}
+plot(df$cylinders,df$mpg,pch=18,main="MPG vs Cylenders", xlab="MPG", ylab="Cylinders",, col = ifelse(df$mpg >35,'green',ifelse(df$mpg >25,'yellow','red')))
+```
+
+Now, we can see that the 4 cylinders have the best MPG ratio. It is obvious because they are the least powerful cars in our dataset.
+
+
+### 4. What is the relation between the displacement and the cylenders?
+
+Of course. If we search the formula of de displacemnet (https://es.wikipedia.org/wiki/Cilindrada#:~:text=Cilindrada%20es%20la%20denominaci%C3%B3n%20que,equivalen%20a%20una%20pulgada%20c%C3%BAbica.), if we have more cylinders, we will have more displacement.
+ 
+Formula:
+$$UnitDisplacement = \frac{\Pi * D^{2}}4 * L $$
+$$TotalDisplacement = \frac{\Pi * D^{2}}4 * L *n$$
+
+Where :
+
+* D is the diameter of the cylinder.
+ 
+* L is the longitud of the piston.
+
+* n totals of the cylinders.
+
+```{r}
+plot(df$cylinders,df$displacement,main="Displacement vs Cylenders", xlab="Displacement", ylab="Cylinders")
+```
+
+We can see the covariance that is all.
+
+```{r}
+cov(df$displacement,df$cylinders)
+```
+
+It is logic see this relation, also we have deduce it on the intro of these question, and we can see this dependence on the formula
+
+### 5. The more cylinders a car has, the heavier it tends to weigth?
+
+All the vehicles that are in this data set are street vehicles. The vehicles of competition have more cylinders and their weight is its weight is very small.
+
+But in the street, the more powerful vehicles have bigger engines. This affects the overall weight of the vehicle.
+
+
+```{r}
+plot(df$cylinders,df$weigth,main="Cylinders with Weigth", xlab="Weigth", ylab="Cylinders", pch=18,col= ifelse(df$cylinders==4,'#DEB887',ifelse(df$cylinders==6,'#5F9EA0','#FF7F50')))
+```
+
+We can see a relation between weight and the cylinders. When more cylinders have the car, more weight is it.
+
+
+
+
+

@@ -1,0 +1,123 @@
+---
+title: "Descriptive Statistics Review"
+author: "Macià Salvà Salvà"
+date: "21746 Data Mining 2022-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## The Data
+We have seen how to introduce data manually using vectors, and seen preloaded data. 
+
+###   Reading preloaded files  
+R has built-in data frames (df). For a complete list of datasets type 
+```{r}
+library(help = "datasets")
+```
+
+Let's look at the popular iris dataset. We start by typing
+```{r}
+?iris
+```
+
+R documentation on the iris data appears on the bottom-right window. Let's look into a couple of things:
+```{r}
+my_data<-iris    ## name iris data set my_data
+```
+
+We can:
+```{r}
+head(my_data)      ## Look at the first few records 
+tail(my_data)      ## .... or the last ones
+names(my_data)     ## Get the list of the columns
+nrow(my_data)      ## Number of rows
+ncol(my_data)      ## Number of columns
+str(my_data)       ## Get the structure of the data
+dim(my_data)       ## Gives the dimensions of the data
+summary(my_data)   ## Get the summary of the data
+```
+
+###    Writing data to a file 
+You can write the data (my_data) from R into a txt file (my_data.txt) in your working directory.
+
+You can change your working directory from RStudio under Session > Set Working Directory > Choose Directory
+```{r}
+write.table(my_data, file = "my_data.txt", sep = "")
+```
+
+You can also write the data from R into a csv file that uses "." for the decimal point and a comma (",") for the separator. The csv files are very popular.
+```{r}
+write.csv(my_data, file = "my_data.csv")
+```
+
+### Reading a CSV file  
+
+Download the salaries.csv file that you will find in the DATASETS folder and place it in your directory. You can read the csv file directly from your directory
+```{r}
+Salaries<-read.csv("salaries.csv")
+head(Salaries)
+```
+
+You can see that the columns of the dataset has names, this dataset has a header. 
+
+You can also read simple comma separated file (csv) from internet.
+
+Let's go to the UCI ML repository (http://archive.ics.uci.edu/ml/datasets.html?task=cla&area=&type=&view=list) to retrieve the data.
+
+You can also find the iris dataset here. The point of this exercise, however, is to show you how to get and use a dataset from UCI. Go to the UCI ML repository to retrieve the data.
+
+Click on the Data Set Description link. This opens a page of valuable information about the data set, including source material, publications that use the data, column names, and more. In this case, this page is particularly valuable because it tells you about some errors in the data.
+
+To download the dataset, you use the read.csv() function. You can do this in several ways. To accomplish everything at once — to use just one function to read the file into R as a dataframe complete with column names — use this code:
+```{r}
+iris.uci <- read.csv(url("http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"), header=TRUE)  ## Assumes presence of the header
+```
+
+### Reading a txt file from your directory 
+Download the LungCapData.txt file that you will find in the DATASETS folder at Aula Digital and place it in your directory. You can read the txt file directly from your directory using:
+```{r}
+read.table("LungCapData.txt", header = TRUE, sep = "", dec = ".")
+```
+
+##  Exploring the Salaries data  
+
+Description of the Salaries dataset: The 2008-09 nine-month academic salary for Assistant 
+Professors, Associate Professors and Professors in a college in the U.S. 
+
+Description of variables:
+
+* rank: a factor with levels AssocProf, AsstProf, Prof
+
+* discipline: a factor with levels A (“theoretical” departments) or B (“applied” departments).
+
+* yrs.since.phd: years since PhD.
+
+* yrs.service: years of service.
+
+* sex: a factor with levels Female Male
+
+* salary: nine-month salary (in dollars)
+
+```{r}
+str(Salaries)       ## Get the structure of the data
+```
+
+We have 6 variables as described before and 78 individuals/a type of professor in a college in the U.S.
+
+The dataset has numerical and categorical variables. When getting a feel for the data it is convenient to check for missing values
+
+###  Data exploratory analysis
+
+boxplot(salaries$salary)
+
+grafic comparacio sous homes i dones.
+
+veim totes ses posibilidads homes i dones segons es sa seva posició laboral
+
+histograma per veure salaris de totes ses dones
+
+scatter
