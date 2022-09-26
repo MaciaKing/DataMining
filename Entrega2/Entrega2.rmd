@@ -9,30 +9,34 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Inlude the dataset:
+## 1. Data processing
+
+First, Inlude the dataset:
+
 ```{r}
 df=read.table(file="auto-mpg.data")
 head(df)
 ```
 
-We must put name to column:
+The data set vars has no name, we should put name to the columns: 
 
 ```{r}
 colnames(df)=c("mpg","cylinders","displacement","horsepower","weigth","acceleration","model year","origin","car name")
 head(df)
 ```
 
-Look at the characteristics of dataset:
+Look the characteristics of dataset:
 
 ```{r}
 str(df)
 ```
 
-In this dataframe, the horsepower are "chr" values and it must be double or integer. Also in our dataset, are null vaules and it must be removed.
+In this data frame, the horsepower is "chr" values and it must be double or integer. Also in the dataset, are null values and they must be removed.
+
 
 ```{r}
 df$horsepower <-as.numeric(as.character(df$horsepower))
-na.omit(df)
+df=na.omit(df)
 str(df)
 ```
 
@@ -40,20 +44,30 @@ Let's print a summary of our data:
 
 ```{r}
 name=colnames(df)
-par(mfrow = c(2, 2))
+par(mfrow = c(2, 4))
 for(i in 1:length(name)) {
   if(i!=length(name)){
-    plot(df[, name[i]], main=toupper(name[i]), ylab=name[i]) 
-    print(i)
+    plot(df[, name[i]], main=toupper(name[i]), ylab=name[i],col="#33D4FF") 
   }
 }
 ```
+
 We can see that cylinders 3 and 5 are not good data. We have very few examples. Let's see what examples we have.
+
 ```{r}
-sprintf("3 Cylynders Examples = %d", sum(df$cylinders=="3")) 
-sprintf("4 Cylynders Examples = %d", sum(df$cylinders=="4")) 
-sprintf("5 Cylynders Examples = %d", sum(df$cylinders=="5")) 
-sprintf("8 Cylynders Examples = %d", sum(df$cylinders=="8")) 
+#This function print the sum of cylinders examples
+printSumCylinders <- function() {
+  v <- c(sum(df$cylinders=="3"),sum(df$cylinders=="4"),sum(df$cylinders=="5"),sum(df$cylinders=="8"))
+
+  n <- c("3","4", "5", "8")
+  m <- data.frame("Cylynders"=n,"Valores"=v)
+  print(m)
+}
+```
+
+
+```{r}
+printSumCylinders()
 ```
 
 We can depreciate the valors of cylinders 3 and 5, because are not good examples. Also between 4 and 8 cylinders is not the best data because we have the double on 4 Cylinders with respect to the 8 cylinders.
@@ -61,16 +75,16 @@ We can depreciate the valors of cylinders 3 and 5, because are not good examples
 ```{r}
 df=df[df$cylinders!=3, ]
 df=df[df$cylinders!=5, ]
-na.omit(df)
-sprintf("3 Cylynders Examples = %d", sum(df$cylinders=="3"))
-sprintf("5 Cylynders Examples = %d", sum(df$cylinders=="5"))
+
+printSumCylinders()
 ```
 ```{r}
 head(df)
 ```
 
+## 2. Questions
 
-### 1. What is the relation between Horsepower and the cylinders?
+### 2.1 What is the relation between Horsepower and the cylinders?
 
 A priori, we think that more cylinders in a car are equivalent to say, this car has more power.
 Let's make a graph between these two variables.
@@ -91,19 +105,19 @@ hp=df$horsepower
 cov(df$cylinders,df$horsepower)
 ```
 
-### 2. The trend of each year is to have cars with more power?
+### 2.2 The trend of each year is to have cars with more power?
 
-This could be an interessant question to ask. But, with these data set can really anser that? People normally have a sport cars? Defnetly not. 
+This could be an interesting question to ask. But, with these data set can really answer that? Do people normally have sports cars? Definitely not.  
 
-But let's see what can be found in hour data set. For this question we decide that if a car has more than 120 horsepower is a power car.
+But let's see what can be found in the data set. For this question, we decide that if a car has more than 120 horsepower is a power car.
 
 ```{r}
 plot(df$`model year`,df$horsepower, main="Cylinders with Weigth", xlab="Horsepower", ylab="Model year",pch=20, col= ifelse(df$horsepower > 120, 'red','green'))
 ```
 
-With these data I think that thise question can not be resolved, because we don't have the real data for these wuestion. In these data set, we only have models from 70's to 82's. Also, where are thise data from? These data is from 
+With these data this question cannot be solved. We also do not take into account hybrid cars and electric cars. Furthermore we are looking at older cars.
 
-### 3. Which cylenders has the better MPG ratio?
+### 2.3 Which cylenders has the better MPG ratio?
 
 I think that if we have more cylinders, we will have less relation MPG. Because we have seen that, if we have more cylinders, we have more power. That power will need more gallons and will produce less relation between MPG.
 
@@ -116,13 +130,13 @@ Now we will consider:
 * If MPG < 25 is a bad relation.
 
 ```{r}
-plot(df$cylinders,df$mpg,pch=18,main="MPG vs Cylenders", xlab="MPG", ylab="Cylinders",, col = ifelse(df$mpg >35,'green',ifelse(df$mpg >25,'yellow','red')))
+plot(df$cylinders,df$mpg,pch=18,main="MPG vs Cylenders", xlab="MPG", ylab="Cylinders", col = ifelse(df$mpg >35,'green',ifelse(df$mpg >25,'yellow','red')))
 ```
 
-Now, we can see that the 4 cylinders have the best MPG ratio. It is obvious because they are the least powerful cars in our dataset.
+Now, we can see that the 4 cylinders have the best MPG ratio. It is obvious because they are the least powerful cars in our data set.
 
 
-### 4. What is the relation between the displacement and the cylenders?
+### 2.4 What is the relation between the displacement and the cylenders?
 
 Of course. If we search the formula of de displacemnet (https://es.wikipedia.org/wiki/Cilindrada#:~:text=Cilindrada%20es%20la%20denominaci%C3%B3n%20que,equivalen%20a%20una%20pulgada%20c%C3%BAbica.), if we have more cylinders, we will have more displacement.
  
@@ -139,10 +153,12 @@ Where :
 * n totals of the cylinders.
 
 ```{r}
-plot(df$cylinders,df$displacement,main="Displacement vs Cylenders", xlab="Displacement", ylab="Cylinders")
+plot(df$cylinders,df$displacement,main="Displacement vs Cylenders", xlab="Cylinders", ylab="Displacement",col = ifelse(df$displacement >300,'red',ifelse(df$displacement >200,'yellow','green')))
 ```
 
-We can see the covariance that is all.
+The red colors are the cars with the largest displacement, while the green colors are the cars with the smallest displacement.
+
+We can see the covariance that good.
 
 ```{r}
 cov(df$displacement,df$cylinders)
@@ -150,7 +166,7 @@ cov(df$displacement,df$cylinders)
 
 It is logic see this relation, also we have deduce it on the intro of these question, and we can see this dependence on the formula
 
-### 5. The more cylinders a car has, the heavier it tends to weigth?
+### 2.5 The more cylinders a car has, the heavier it tends to weigth?
 
 All the vehicles that are in this data set are street vehicles. The vehicles of competition have more cylinders and their weight is its weight is very small.
 
@@ -163,7 +179,30 @@ plot(df$cylinders,df$weigth,main="Cylinders with Weigth", xlab="Weigth", ylab="C
 
 We can see a relation between weight and the cylinders. When more cylinders have the car, more weight is it.
 
+## 3. Data Distribution
+
+With a corrplot we can see the dependencies of our variables. 
+
+```{r}
+library(corrplot)
+corrplot(cor(df[1:8]),method= "number") # colorful number
+```
+
+Some of the questions answered, we can see their relationships by means of this matrix. For example between the MPG and the cylinders variable we found a -0.79 is close to 1, that means that there is a relation between these variables.
+
+Also, we can see some variables that not have connexions between them. For example, the  'Model year' variable between 'acceleration'  variable the relationship is not close. But it is logical since they have nothing to do with each other. In a year, cars can been created with higher and lower acceleration.
 
 
+Let's see the distribution:
 
+```{r}
+name=colnames(df)
+par(mfrow = c(2, 4))
+for(i in 1:length(name)) {
+  if(i!=length(name)){
+    hist(df[, name[i]], main=toupper(name[i]),ylab=name[i],xlab = "distribution",col="#33D4FF") 
+  }
+}
+```
 
+The distribution of our data is correct and logical. For example we find values such as horsepower, ranging from 50 to 150. This distribution is logical since a normal car has at least 50 horsepower.
